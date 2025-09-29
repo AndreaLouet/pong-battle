@@ -2,6 +2,7 @@
   "name": "pong-battle2",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -9,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
+"dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "socket.io": "^4.8.1"
   }

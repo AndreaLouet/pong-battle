@@ -1,24 +1,51 @@
 const express = require('express');
-const app = express();
 const http = require('http');
+const socketIo = require('socket.io');
+
+
+const app = express();
 const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server, {
-  cors:{
-    origin:"*",
-    methods:["GET", "POST"]
+
+const io = socketIo(server, {
+    cors: {
+      origin: "*", // Remplace par ton origine autorisée
+      methods: ["GET", "POST"],
+      credentials: true, // Parfois utile pour les cookies ou authentification
+    }
+  });
+
+let players = {};
+
+io.on("connection", (socket) => {
+  players[socket.id] = { ready: false };
+  console.log(socket.id)
+
+  socket.on("ready", () => {
+    console.log("ready")
+    if (players[socket.id]) {
+      players[socket.id].ready = true;
+      checkStartCondition();
+      console.log(players[socket.id])
+    }
+  });
+
+  socket.on("disconnect", () => {
+    delete players[socket.id];
+  });
+});
+
+function checkStartCondition() {
+  const connectedCount = Object.keys(players).length;
+
+  if (connectedCount === 3) {
+    const allReady = Object.values(players).every(p => p.ready);
+    if (allReady) {
+      io.emit("start", { time: Date.now() });
+    }
   }
-});
+}
 
-app.get('/', (req, res) => {
-  res.send('Test')
-  res.sendFile(__dirname + '/index.html');
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-});
 
 server.listen(3000, () => {
-  console.log('listening on *:3000');
+  console.log("En écoute sur http://localhost:3000");
 });
