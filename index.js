@@ -18,7 +18,6 @@ let players = {};
 
 io.on("connection", (socket) => {
   players[socket.id] = { ready: false };
-  console.log(socket.id)
 
   socket.on("ready", () => {
     console.log("ready")
@@ -36,10 +35,12 @@ io.on("connection", (socket) => {
 
 function checkStartCondition() {
   const connectedCount = Object.keys(players).length;
-
+  console.log(connectedCount)
+  
   if (connectedCount === 3) {
     const allReady = Object.values(players).every(p => p.ready);
     if (allReady) {
+      console.log('all ready !')
       io.emit("start", { time: Date.now() });
     }
   }
